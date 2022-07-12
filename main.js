@@ -5,6 +5,28 @@ const jimp=require('jimp');
 const formidable=require('formidable');
 const path=require('path');
 const fs=require('fs');
+const sqlite3=require('sqlite3').verbose();
+const db=new sqlite3.Database('./db.db');
+
+const query = (command, method = 'all') => {
+    return new Promise((resolve, reject) => {
+      db[method](command, (error, result) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  };
+
+ /*  db.serialize(async () => {
+    await query("CREATE TABLE IF NOT EXISTS posts (date text, title text, author text, content text, tags text)", 'run');
+  }); */
+ // query(`INSERT INTO posts VALUES ("${new Date().toISOString()}", "dddd", "Ryan Glover", "ds46f54sd65f46sd54f654", "1")`, 'run').then(() => {console.log("subido")});
+  query("SELECT * FROM posts").then(result=>{
+    console.log(result);
+})
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
@@ -34,3 +56,7 @@ jimp.read(files.file.filepath, (err, res) => {
   });
 
 }
+app.get("/img/:nombre",(req,res)=>{
+    res.sendFile(path.join(__dirname,'img/'+req.params.nombre));
+    //1657661951573.jpeg
+})
